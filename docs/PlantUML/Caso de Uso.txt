@@ -1,0 +1,29 @@
+@startuml
+left to right direction
+actor "Jogador" as J
+actor "Sistema (Inimigo/IA)" as IA
+
+rectangle "Jogo RPG - Calabouço" {
+  usecase "Criar Personagem" as UC1
+  usecase "Escolher Ação no Combate" as UC2
+  usecase "Atacar" as UC3
+  usecase "Defender" as UC4
+  usecase "Usar Habilidade Especial" as UC5
+  usecase "Recuperar (Vida/Energia)" as UC6
+  usecase "Decidir Pós-Combate" as UC7
+  usecase "Evoluir Atributos" as UC8
+  usecase "Executar Turno Automático" as UC9
+  
+  J --> UC1
+  J --> UC2
+  J --> UC7
+  J --> UC8
+  
+  UC2 ..> UC3 : <<include>>
+  UC2 ..> UC4 : <<include>>
+  UC2 ..> UC5 : <<include>>
+  UC2 ..> UC6 : <<include>>
+  
+  IA --> UC9
+}
+@enduml

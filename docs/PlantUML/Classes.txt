@@ -1,0 +1,61 @@
+@startuml
+interface HabilidadeEspecial {
+  + usarHabilidade(alvo: PersonagemBase): void
+}
+
+interface Recuperavel {
+  + recuperar(tipo: String): void
+}
+
+abstract class PersonagemBase {
+  - nome: String
+  - vida: int
+  - ataque: int
+  - defesa: int
+  - energia: int
+  - xp: int
+  - multiplicadorXp: double
+  + PersonagemBase(nome: String, ...)
+  + getVida(): int
+  + setVida(vida: int): void
+  + evoluirAtributo(tipo: int): void
+  + receberDano(dano: int): void
+  + estaVivo(): boolean
+  + {abstract} atacar(alvo: PersonagemBase): void
+}
+
+class Guerreiro {
+  + atacar(alvo: PersonagemBase): void
+  + usarHabilidade(alvo: PersonagemBase): void
+  + recuperar(tipo: String): void
+}
+
+class Mago {
+  + atacar(alvo: PersonagemBase): void
+  + usarHabilidade(alvo: PersonagemBase): void
+  + recuperar(tipo: String): void
+}
+
+class Arqueiro {
+  + atacar(alvo: PersonagemBase): void
+  + usarHabilidade(alvo: PersonagemBase): void
+  + recuperar(tipo: String): void
+}
+
+class GerenciadorJogo {
+  - calabouco: PersonagemBase[]
+  - heroi: PersonagemBase
+  + iniciarJogo(): void
+  + instanciarChefao(heroi: PersonagemBase): PersonagemBase
+  + loopCombate(inimigo: PersonagemBase): void
+}
+
+PersonagemBase ..|> HabilidadeEspecial
+PersonagemBase ..|> Recuperavel
+
+PersonagemBase <|-- Guerreiro
+PersonagemBase <|-- Mago
+PersonagemBase <|-- Arqueiro
+
+GerenciadorJogo o-- "1..*" PersonagemBase : gerencia
+@enduml

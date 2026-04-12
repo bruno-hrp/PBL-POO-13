@@ -1,0 +1,38 @@
+@startuml
+actor Jogador
+participant "ControleCombate" as C
+participant "heroi : PersonagemBase" as H
+participant "inimigo : PersonagemBase" as I
+
+Jogador -> C : Escolhe ação (Ex: 1 - Atacar)
+activate C
+
+C -> C : try-catch (Validar Input)
+
+C -> H : atacar(inimigo)
+activate H
+H -> H : Calcular Dano \n(Considera vantagem de Classe)
+H -> I : receberDano(danoCalculado)
+activate I
+I --> H : Status Vida Atualizada
+deactivate I
+H --> C : Resultado do Ataque
+deactivate H
+
+opt Inimigo ainda vivo
+    C -> I : executarAcaoIA(heroi)
+    activate I
+    I -> I : Escolher melhor ação (IA)
+    I -> H : atacar/usarHabilidade(heroi)
+    activate H
+    H -> H : receberDano(dano)
+    H --> I : Status Vida
+    deactivate H
+    I --> C : Resultado Turno Inimigo
+    deactivate I
+end
+
+C -> C : finally (Exibir Status Atual)
+C --> Jogador : Mostrar Status (Vida/Energia)
+deactivate C
+@enduml

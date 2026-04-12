@@ -1,0 +1,42 @@
+@startuml
+start
+:Iniciar Jogo;
+:Jogador escolhe Classe (Guerreiro, Mago, Arqueiro);
+:Inicializar Vetor de Inimigos (Calabouço);
+repeat
+  :Instanciar Inimigo da Fase;
+  repeat
+    :Turno do Jogador (Menu de Ações);
+    :Validar entrada (try-catch);
+    :Aplicar Dano/Efeito no Inimigo;
+    if (Inimigo Vivo?) then (Sim)
+      :Turno do Inimigo (IA automática);
+      :Aplicar Dano/Efeito no Jogador;
+    else (Não)
+    endif
+  repeat while (Jogador Vivo? e Inimigo Vivo?)
+  
+  if (Jogador Vivo?) then (Sim)
+    :Combate Vencido;
+    :Calcular XP ganha;
+    if (É o Chefão Final?) then (Não)
+      :Menu Pós-Combate;
+      if (Escolha) then (Descansar)
+        :Recuperar Vida/Energia;
+        :Resetar Multiplicador XP;
+      else (Seguir Direto)
+        :Aumentar Multiplicador XP (Streak);
+      endif
+    else (Sim)
+      :VITÓRIA DO JOGO!;
+      stop
+    endif
+    
+    :Menu de Evolução (Gastar XP);
+    :Evoluir Atributos (Encapsulamento);
+  else (Não)
+    :GAME OVER;
+    stop
+  endif
+repeat while (Existem inimigos no vetor?)
+@enduml

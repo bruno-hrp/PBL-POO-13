@@ -1,0 +1,25 @@
+Requsitos Funcionais
+RF01 - Criação de Personagem: O sistema deve permitir que o jogador escolha uma entre três classes disponíveis (Guerreiro, Mago ou Arqueiro) no início do jogo.
+RF02 - Fila de Inimigos (Calabouço): O sistema deve gerenciar uma sequência de combates instanciando inimigos a partir de um vetor (array) ou coleção.
+RF03 - Geração do Chefe Final: O sistema deve analisar a classe escolhida pelo jogador e instanciar automaticamente um Chefão da classe que o contra-ataca (Counter).
+RF04 - Menu de Combate: O sistema deve exibir um menu de turno com as opções: Atacar, Defender, Usar Habilidade Especial e Recuperar.
+RF05 - Turno da IA: O sistema deve executar automaticamente a ação do inimigo após o turno do jogador, baseando-se em decisões lógicas simples (ex: se tem energia, usa habilidade; senão, ataca).
+RF06 - Menu Pós-Combate (Risco vs. Recompensa): O sistema deve oferecer ao jogador as opções de "Descansar" ou "Seguir Direto" após vencer um inimigo comum.
+RF07 - Evolução de Status: O sistema deve permitir que o jogador gaste pontos de Experiência (XP) acumulados para evoluir atributos específicos (Ataque, Defesa, Vida Máxima ou Energia Máxima).
+RF08 - Exibição de Status (HUD): O sistema deve imprimir na tela, a cada turno, os valores atuais de Vida e Energia de ambos os combatentes.
+
+Requisitos Não Funcionais
+RNF01 - Plataforma e Linguagem: O jogo deve ser desenvolvido inteiramente na linguagem Java e executado via Console (Interface de Linha de Comando).
+RNF02 - Paradigma de Programação: O código deve obrigatoriamente aplicar os pilares da Orientação a Objetos (Encapsulamento, Herança e Polimorfismo) e utilizar Classes Abstratas e Interfaces.
+RNF03 - Tolerância a Falhas (Robustez): O sistema não deve ser interrompido por entradas inválidas do usuário (ex: digitar uma letra em vez de um número no menu). Todas as entradas e navegações em vetores devem ser protegidas por blocos try-catch-finally.
+RNF04 - Integridade de Dados: O acesso e a modificação dos atributos dos personagens devem ser feitos exclusivamente por métodos getters e setters, garantindo o encapsulamento seguro.
+RNF05 - Estrutura Modular: O código-fonte deve ser organizado em arquivos .java separados para cada classe, interface e para a classe principal (Main).
+
+Regras de Negócio
+RN01 - Cálculo de Dano: O dano de um ataque convencional é calculado pela fórmula: Dano = Ataque do Agressor - Defesa do Alvo.
+RN02 - Dano Mínimo Garantido: Se a defesa do alvo for maior ou igual ao ataque do agressor, o dano resultante nunca será negativo ou zero. O sistema deve aplicar um dano mínimo obrigatório de 1.
+RN03 - Consumo de Energia: Ações específicas possuem custo. Usar a "Habilidade Especial" consome 30 de energia. Usar a "Defesa" (que reduz o dano do próximo turno do oponente) consome 10 de energia. O sistema deve impedir a execução dessas ações se o saldo de energia for insuficiente.
+RN04 - Limites de Atributos: A Vida e a Energia de qualquer personagem nunca podem ser menores que 0, nem podem ultrapassar o valor máximo definido para aquele nível/personagem.
+RN05 - Impasse Triplo (Vantagem de Classe): Existe um ciclo de vantagens: Guerreiro vence Arqueiro, Arqueiro vence Mago, e Mago vence Guerreiro. Quando um personagem ataca um alvo sobre o qual tem vantagem, o ataque ganha um bônus de 20% no dano final calculado ou ignora a defesa inimiga.
+RN06 - Multiplicador de Experiência (Streak): Se o jogador escolher "Seguir Direto" no pós-combate, o multiplicador de XP aumenta em 0.5x. Se escolher "Descansar", a vida vai para 100%, a energia sobe 50%, mas o multiplicador de XP é redefinido para 1.0x.
+RN07 - Condições de Vitória/Derrota: O combate atual encerra imediatamente quando a Vida de um dos lados chega a 0. O jogo resulta em "Game Over" se a vida do Herói chegar a 0. O jogo resulta em "Vitória" se a vida do Chefe Final chegar a 0.

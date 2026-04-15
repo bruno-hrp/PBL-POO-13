@@ -3,13 +3,13 @@ package rpg;
 public class Arqueiro extends PersonagemBase implements HabilidadeEspecial, Recuperavel {
 
     public Arqueiro(String nome) {
-        super(nome, 100, 30, 10, 100, 25, 25);
+        super(nome, 100, 35, 25 ,120, 35,15);
         setClasse(ClassePersonagem.ARQUEIRO);
     }
 
     @Override
     public String getSprite() {
-        return  "    O    \n" +
+        return  
                 "   /|>   \n" +
                 "   /|    \n" +
                 "   [ ]   \n" +

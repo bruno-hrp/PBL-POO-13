@@ -38,6 +38,6 @@ public enum Bioma {
         int esquiva = Integer.parseInt(t[5]);
         int critico = Integer.parseInt(t[6]);
         int xp      = (int)(Integer.parseInt(t[7]) * escala);
-        return new Inimigo(t[0], vida, ataque, defesa, energia, esquiva, critico, xp);
+        return new Inimigo(t[0], vida, ataque, defesa, energia, esquiva, critico, xp, xp, false);
     }
 }

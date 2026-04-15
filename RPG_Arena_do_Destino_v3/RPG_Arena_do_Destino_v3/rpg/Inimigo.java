@@ -20,9 +20,9 @@ public class Inimigo extends PersonagemBase implements HabilidadeEspecial, Recup
 
     // Templates exclusivos de BOSS
     public static final String[][] TEMPLATES_BOSS = {
-        {"BOSS: Rei Lich",        "300", "45", "20", "150", "10", "30", "200", "150"},
-        {"BOSS: Dragao Anciao",   "350", "50", "25", "120", "15", "35", "250", "200"},
-        {"BOSS: Senhor das Trevas","280","55", "15", "180", "20", "40", "220", "175"},
+        {"BOSS: Rei Lich",        "300", "40", "20", "110", "10", "20", "200", "200"},
+        {"BOSS: Dragao Anciao",   "320", "40", "20", "120", "15", "25", "250", "200"},
+        {"BOSS: Senhor das Trevas","250","50", "15", "150", "20", "15", "220", "200"},
     };
 
     public Inimigo(String tipo, int vida, int ataque, int defesa, int energia,

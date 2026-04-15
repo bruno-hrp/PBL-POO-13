@@ -157,11 +157,11 @@ public class Combate {
 
     /**
      * RN05 — Calcula dano com bônus de vantagem de classe.
-     * Se o atacante tem vantagem, aplica +20% no dano bruto antes da defesa.
+     * Se o atacante tem vantagem, aplica +0% no dano bruto antes da defesa.
      */
     public static int aplicarVantagemClasse(int danoBase, ClassePersonagem atacante, ClassePersonagem defensor) {
         if (atacante.temVantagemSobre(defensor)) {
-            return (int)(danoBase * 1.20);
+            return (int)(danoBase * 1.10);
         }
         return danoBase;
     }

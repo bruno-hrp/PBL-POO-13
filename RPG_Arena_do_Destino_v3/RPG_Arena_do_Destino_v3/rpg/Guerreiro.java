@@ -3,7 +3,7 @@ package rpg;
 public class Guerreiro extends PersonagemBase implements HabilidadeEspecial, Recuperavel {
 
     public Guerreiro(String nome) {
-        super(nome, 120, 28, 15, 80, 10, 20);
+        super(nome, 120, 35, 30, 90, 10, 10);
         setClasse(ClassePersonagem.GUERREIRO);
     }
 

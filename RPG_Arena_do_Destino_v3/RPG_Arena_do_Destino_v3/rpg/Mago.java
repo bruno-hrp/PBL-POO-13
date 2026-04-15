@@ -3,7 +3,7 @@ package rpg;
 public class Mago extends PersonagemBase implements HabilidadeEspecial, Recuperavel {
 
     public Mago(String nome) {
-        super(nome, 85, 35, 8, 120, 15, 30);
+        super(nome, 95, 40, 8, 120, 15, 30);
         setClasse(ClassePersonagem.MAGO);
     }
 

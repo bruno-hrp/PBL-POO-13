@@ -200,7 +200,7 @@ public class Combate {
         System.out.println("  Ouro   : " + jogador.getOuro() + "G");
         System.out.println();
         System.out.printf ("  Inimigo: %s%s%n", inimigo.getNome(), statusIni);
-        System.out.println("  Vida   : " + inimigo.barraVida());
+        System.out.println("  Vida   : " + inimigo.barraVidaInimigo());
         System.out.println("  Energia: " + inimigo.barraEnergia());
         System.out.println("  ------------------------------");
     }

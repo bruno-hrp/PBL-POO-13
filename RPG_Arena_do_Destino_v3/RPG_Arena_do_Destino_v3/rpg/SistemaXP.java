@@ -19,13 +19,14 @@ public class SistemaXP {
     private double multiplicadorXP;
 
     private static final int XP_BASE_NIVEL          = 100;
-    public  static final int XP_PENALIDADE_DESCANSO = 20;
+    public  static final int XP_PENALIDADE_DESCANSO = 0; // Removido gasto de XP ao descansar
 
-    // RF07 — custo base de cada atributo em XP
-    public static final int CUSTO_XP_ATAQUE  = 30;
-    public static final int CUSTO_XP_DEFESA  = 25;
-    public static final int CUSTO_XP_VIDA    = 20;
-    public static final int CUSTO_XP_ENERGIA = 20;
+    // RF07 — custo base de cada atributo em XP (escalam com nível/streak)
+    public static final int CUSTO_XP_ATAQUE    = 30;
+    public static final int CUSTO_XP_DEFESA    = 25;
+    public static final int CUSTO_XP_VIDA      = 20;
+    public static final int CUSTO_XP_ENERGIA   = 20;
+    public static final int CUSTO_XP_AGILIDADE = 22;
 
     public SistemaXP() {
         this.xpAtual            = 0;
@@ -36,6 +37,16 @@ public class SistemaXP {
         this.xpDisponivel       = 0;
         this.streakAtual        = 0;
         this.multiplicadorXP    = 1.0;
+    }
+
+    /**
+     * Calcula o custo real de um atributo considerando nível do personagem e multiplicador de streak.
+     * Balanceamento: nível alto e streak alta = custo maior para cada melhoria.
+     */
+    public int calcularCustoReal(int custoBase, int nivelPersonagem) {
+        double fatorNivel  = 1.0 + (nivelPersonagem - 1) * 0.10;
+        double fatorStreak = multiplicadorXP;
+        return (int) Math.ceil(custoBase * fatorNivel * fatorStreak);
     }
 
     /**
@@ -67,7 +78,7 @@ public class SistemaXP {
         return false;
     }
 
-    /** RF07 — Menu interativo de gasto de XP em atributos. */
+    /** RF07 — Menu interativo de gasto de XP em atributos, com opção de múltiplos níveis de uma vez. */
     public void menuGastoXP(PersonagemBase jogador, Scanner scanner) {
         if (xpDisponivel <= 0) {
             System.out.println("  Nenhum XP disponivel para gastar.");
@@ -75,42 +86,75 @@ public class SistemaXP {
         }
         boolean saiu = false;
         while (!saiu && xpDisponivel > 0) {
-            System.out.println("\n  +====================================+");
-            System.out.println("  |      DISTRIBUIR PONTOS DE XP       |");
-            System.out.println("  +====================================+");
-            System.out.printf ("  | XP Disponivel: %-19d|%n", xpDisponivel);
-            System.out.println("  +------------------------------------+");
-            System.out.printf ("  | 1. Ataque  (+3)  custo %3d XP     |%n", CUSTO_XP_ATAQUE);
-            System.out.printf ("  | 2. Defesa  (+2)  custo %3d XP     |%n", CUSTO_XP_DEFESA);
-            System.out.printf ("  | 3. Vida    (+20) custo %3d XP     |%n", CUSTO_XP_VIDA);
-            System.out.printf ("  | 4. Energia (+15) custo %3d XP     |%n", CUSTO_XP_ENERGIA);
-            System.out.println("  | 5. Confirmar e sair                |");
-            System.out.println("  +====================================+");
+            int nivel     = jogador.getNivel();
+            int custoAtq  = calcularCustoReal(CUSTO_XP_ATAQUE,    nivel);
+            int custoDef  = calcularCustoReal(CUSTO_XP_DEFESA,    nivel);
+            int custoVid  = calcularCustoReal(CUSTO_XP_VIDA,      nivel);
+            int custoNrg  = calcularCustoReal(CUSTO_XP_ENERGIA,   nivel);
+            int custoAgi  = calcularCustoReal(CUSTO_XP_AGILIDADE, nivel);
+
+            System.out.println("\n  +========================================+");
+            System.out.println("  |       DISTRIBUIR PONTOS DE XP          |");
+            System.out.println("  +========================================+");
+            System.out.printf ("  | XP Disponivel: %-23d|%n", xpDisponivel);
+            System.out.printf ("  | Nivel: %-6d        Streak: x%-6d|%n", nivel, streakAtual);
+            System.out.println("  +----------------------------------------+");
+            System.out.printf ("  | 1. Ataque    (+3 por vez)  custo %5d  |%n", custoAtq);
+            System.out.printf ("  | 2. Defesa    (+2 por vez)  custo %5d  |%n", custoDef);
+            System.out.printf ("  | 3. Vida      (+20 por vez) custo %5d  |%n", custoVid);
+            System.out.printf ("  | 4. Energia   (+15 por vez) custo %5d  |%n", custoNrg);
+            System.out.printf ("  | 5. Agilidade (+2%% por vez) custo %5d  |%n", custoAgi);
+            System.out.println("  | 6. Confirmar e sair                     |");
+            System.out.println("  +========================================+");
             System.out.print("  Escolha: ");
             try {
                 int op = Integer.parseInt(scanner.nextLine().trim());
-                switch (op) {
-                    case 1:
-                        if (gastarXPDisponivel(CUSTO_XP_ATAQUE)) jogador.melhorarAtaqueComXP(3);
-                        else System.out.println("  X XP insuficiente! (precisa " + CUSTO_XP_ATAQUE + ")");
-                        break;
-                    case 2:
-                        if (gastarXPDisponivel(CUSTO_XP_DEFESA)) jogador.melhorarDefesaComXP(2);
-                        else System.out.println("  X XP insuficiente! (precisa " + CUSTO_XP_DEFESA + ")");
-                        break;
-                    case 3:
-                        if (gastarXPDisponivel(CUSTO_XP_VIDA)) jogador.melhorarVidaComXP(20);
-                        else System.out.println("  X XP insuficiente! (precisa " + CUSTO_XP_VIDA + ")");
-                        break;
-                    case 4:
-                        if (gastarXPDisponivel(CUSTO_XP_ENERGIA)) jogador.melhorarEnergiaComXP(15);
-                        else System.out.println("  X XP insuficiente! (precisa " + CUSTO_XP_ENERGIA + ")");
-                        break;
-                    case 5:
-                        saiu = true;
-                        break;
-                    default:
-                        System.out.println("  X Opcao invalida.");
+                if (op >= 1 && op <= 5) {
+                    int custoUnitario;
+                    String nomeAtrib;
+                    switch (op) {
+                        case 1: custoUnitario = custoAtq; nomeAtrib = "Ataque";    break;
+                        case 2: custoUnitario = custoDef; nomeAtrib = "Defesa";    break;
+                        case 3: custoUnitario = custoVid; nomeAtrib = "Vida";      break;
+                        case 4: custoUnitario = custoNrg; nomeAtrib = "Energia";   break;
+                        default: custoUnitario = custoAgi; nomeAtrib = "Agilidade";
+                    }
+
+                    int maxNiveis = xpDisponivel / custoUnitario;
+                    if (maxNiveis <= 0) {
+                        System.out.println("  X XP insuficiente! (precisa " + custoUnitario + ")");
+                        continue;
+                    }
+
+                    System.out.printf("  Voce pode upar %s ate %d vez(es) agora.%n", nomeAtrib, maxNiveis);
+                    System.out.print("  Quantas vezes deseja upar? (1-" + maxNiveis + ", 0=cancelar): ");
+                    int vezes;
+                    try {
+                        vezes = Integer.parseInt(scanner.nextLine().trim());
+                    } catch (NumberFormatException ex) {
+                        System.out.println("  X Entrada invalida.");
+                        continue;
+                    }
+                    if (vezes <= 0) continue;
+                    if (vezes > maxNiveis) {
+                        System.out.println("  X Ajustado para o maximo possivel: " + maxNiveis + ".");
+                        vezes = maxNiveis;
+                    }
+
+                    int custoTotal = custoUnitario * vezes;
+                    if (gastarXPDisponivel(custoTotal)) {
+                        switch (op) {
+                            case 1: jogador.melhorarAtaqueComXP(3 * vezes);     break;
+                            case 2: jogador.melhorarDefesaComXP(2 * vezes);     break;
+                            case 3: jogador.melhorarVidaComXP(20 * vezes);      break;
+                            case 4: jogador.melhorarEnergiaComXP(15 * vezes);   break;
+                            case 5: jogador.melhorarAgilidadeComXP(2 * vezes);  break;
+                        }
+                    }
+                } else if (op == 6) {
+                    saiu = true;
+                } else {
+                    System.out.println("  X Opcao invalida.");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("  X Entrada invalida.");
@@ -127,11 +171,11 @@ public class SistemaXP {
         return true;
     }
 
-    /** RN06 — Incrementa streak ao vencer sem descansar. */
+    /** RN06 — Incrementa streak ao vencer sem descansar. Bônus de 20% por nível de streak (era 40%). */
     public void registrarVitoriaStreak() {
         streakAtual++;
         if (streakAtual > 1) {
-            multiplicadorXP = 1.0 + (streakAtual - 1) * 0.5;
+            multiplicadorXP = 1.0 + (streakAtual - 1) * 0.20;
             System.out.printf("  [STREAK x%d] Multiplicador de XP: %.1fx!%n", streakAtual, multiplicadorXP);
         }
     }
@@ -144,15 +188,10 @@ public class SistemaXP {
         multiplicadorXP = 1.0;
     }
 
+    /** Descansar não gasta XP, apenas reseta streak. */
     public void penalizarDescanso() {
-        int perda = Math.min(xpAtual, XP_PENALIDADE_DESCANSO);
-        xpAtual -= perda;
-        xpDisponivel = Math.max(0, xpDisponivel - perda);
-        if (xpAtual < 0) xpAtual = 0;
-        String log = "-" + perda + " XP (descanso) | Total: " + xpAtual + "/" + xpParaProximoNivel;
-        historicoAcoes.add(log);
-        System.out.println("  [!] " + log);
         resetarStreak();
+        System.out.println("  [DESCANSO] Nenhum XP perdido. Streak resetada.");
     }
 
     public void registrarBatalha(boolean vitoria) {

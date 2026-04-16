@@ -11,20 +11,26 @@ public class Main {
 
     public static void main(String[] args) {
         exibirTela();
-        PersonagemBase jogador   = criarPersonagem();
-        SistemaXP      sistemaXP = new SistemaXP();
+        iniciarJogo();
+        System.out.println("\n  Obrigado por jogar! Ate a proxima aventura.");
+        scanner.close();
+    }
+
+    /** Inicializa e roda o loop principal do jogo. Permite reiniciar após game over. */
+    private static void iniciarJogo() {
+        PersonagemBase jogador    = criarPersonagem();
+        SistemaXP      sistemaXP  = new SistemaXP();
         Inventario     inventario = new Inventario();
-        int[]          ouro      = { jogador.getOuro() };
+        int[]          ouro       = { jogador.getOuro() };
 
         System.out.println("\n  Bem-vindo, " + jogador.getNome() + "!");
         System.out.println("  " + jogador);
         pausa(800);
 
-        int     calabouco = 1;  // RF02: cada calabouço = 5+1 batalhas
+        int     calabouco = 1;
         boolean continuar = true;
 
         while (continuar) {
-            // ── RF02: Sequência de 5 inimigos normais ─────────
             System.out.println("\n  ==========================================");
             System.out.printf ("  CALABOUCO #%d  |  Vitorias:%d%n",
                     calabouco, sistemaXP.getBatalhasVencidas());
@@ -44,7 +50,6 @@ public class Main {
                 jogador.restaurarParaBatalha(false);
 
                 Inimigo inimigo = Inimigo.criarDosBioma(bioma, jogador.getNivel());
-                // Atribui classe aleatória ao inimigo normal para o triângulo (RN05)
                 ClassePersonagem[] classes = ClassePersonagem.values();
                 inimigo.setClasseInimigo(classes[(int)(Math.random() * classes.length)]);
 
@@ -58,8 +63,7 @@ public class Main {
                 ouro[0] = jogador.getOuro();
 
                 if (venceu) {
-                    sistemaXP.registrarVitoriaStreak(); // RN06
-                    // RF07: notifica XP disponível mas não sobe nível automaticamente
+                    sistemaXP.registrarVitoriaStreak();
                     sistemaXP.tentarSubirNivel(jogador);
 
                     if (pos < INIMIGOS_POR_CALABOUCO) {
@@ -67,11 +71,14 @@ public class Main {
                         if (!continuar) { sobreviveu = false; break; }
                     }
                 } else {
-                    System.out.println("\n  Jornada encerrada apos " + sistemaXP.getBatalhasTotais()
-                            + " batalhas e " + sistemaXP.getBatalhasVencidas() + " vitorias.");
                     sistemaXP.exibirHistorico();
                     sobreviveu = false;
                     continuar  = false;
+                    // Game Over — pergunta se quer tentar novamente
+                    if (menuGameOver(sistemaXP)) {
+                        iniciarJogo(); // reinicia recursivamente
+                        return;
+                    }
                 }
             }
 
@@ -84,7 +91,6 @@ public class Main {
 
                 jogador.restaurarParaBatalha(false);
 
-                // RF03: boss é da classe que vence a do jogador
                 Inimigo boss = Inimigo.criarBossCounterClasse(jogador.getNivel(), jogador.getClasse());
 
                 System.out.printf("  %s aparece! (XP:%d | Ouro:%dG)%n",
@@ -97,21 +103,44 @@ public class Main {
                 ouro[0] = jogador.getOuro();
 
                 if (venceuBoss) {
-                    sistemaXP.registrarVitoriaStreak(); // RN06
+                    sistemaXP.registrarVitoriaStreak();
                     sistemaXP.tentarSubirNivel(jogador);
                     calabouco++;
                     continuar = menuPosBoss(jogador, inventario, sistemaXP, ouro);
                 } else {
-                    System.out.println("\n  Jornada encerrada apos " + sistemaXP.getBatalhasTotais()
-                            + " batalhas e " + sistemaXP.getBatalhasVencidas() + " vitorias.");
                     sistemaXP.exibirHistorico();
                     continuar = false;
+                    if (menuGameOver(sistemaXP)) {
+                        iniciarJogo();
+                        return;
+                    }
                 }
             }
         }
+    }
 
-        System.out.println("\n  Obrigado por jogar! Ate a proxima aventura.");
-        scanner.close();
+    // ── Game Over ────────────────────────────────────────────
+
+    /** Exibe o menu de game over e retorna true se o jogador quer tentar novamente. */
+    private static boolean menuGameOver(SistemaXP sistemaXP) {
+        System.out.println("\n  +==========================================+");
+        System.out.println("  |                                          |");
+        System.out.println("  |            ** GAME OVER **               |");
+        System.out.println("  |                                          |");
+        System.out.printf ("  |  Batalhas: %-7d  Vitorias: %-7d   |%n",
+                sistemaXP.getBatalhasTotais(), sistemaXP.getBatalhasVencidas());
+        System.out.println("  |                                          |");
+        System.out.println("  +==========================================+");
+        System.out.println("  | 1. Tentar Novamente                      |");
+        System.out.println("  | 2. Encerrar o Jogo                       |");
+        System.out.println("  +==========================================+");
+        System.out.print("  Escolha: ");
+        try {
+            int op = Integer.parseInt(scanner.nextLine().trim());
+            return op == 1;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 
     // ── Criação de personagem ─────────────────────────────────
@@ -181,13 +210,13 @@ public class Main {
         System.out.println("  |       ENTRE INIMIGOS             |");
         System.out.println("  +----------------------------------+");
         System.out.println("  | 1. Proximo Inimigo               |");
-        System.out.printf ("  | 2. Descansar (-%dXP, vida 100%%)  |%n",
-                SistemaXP.XP_PENALIDADE_DESCANSO);
+        System.out.println("  | 2. Descansar (vida 100%)         |");
         System.out.println("  | 3. Abrir Loja                    |");
         System.out.println("  | 4. Ver Inventario                |");
         System.out.printf ("  | 5. Gastar XP [%3d disp.]         |%n", sistemaXP.getXpDisponivel());
         System.out.println("  | 6. Estatisticas                  |");
-        System.out.println("  | 7. Encerrar Jogo                 |");
+        System.out.println("  | 7. Status do Personagem          |");
+        System.out.println("  | 8. Encerrar Jogo                 |");
         System.out.printf ("  | Streak: x%d | Mult: %.1fx           |%n",
                 sistemaXP.getStreakAtual(), sistemaXP.getMultiplicadorXP());
         System.out.println("  +----------------------------------+");
@@ -206,7 +235,7 @@ public class Main {
             case 1: return true;
             case 2:
                 System.out.println("  " + jogador.getNome() + " descansa...");
-                sistemaXP.penalizarDescanso(); // RN06: reseta streak internamente
+                sistemaXP.penalizarDescanso();
                 jogador.restaurarParaBatalha(true);
                 return true;
             case 3:
@@ -217,12 +246,15 @@ public class Main {
                 gerenciarInventario(jogador, inventario);
                 return menuEntreBatalhas(jogador, inventario, sistemaXP, ouro);
             case 5:
-                sistemaXP.menuGastoXP(jogador, scanner); // RF07
+                sistemaXP.menuGastoXP(jogador, scanner);
                 return menuEntreBatalhas(jogador, inventario, sistemaXP, ouro);
             case 6:
                 exibirEstatisticas(jogador, sistemaXP);
                 return menuEntreBatalhas(jogador, inventario, sistemaXP, ouro);
-            case 7: return false;
+            case 7:
+                exibirStatusPersonagem(jogador);
+                return menuEntreBatalhas(jogador, inventario, sistemaXP, ouro);
+            case 8: return false;
             default:
                 System.out.println("  X Opcao invalida.");
                 return true;
@@ -237,13 +269,13 @@ public class Main {
         System.out.println("  |    BOSS DERROTADO! PARABENS!     |");
         System.out.println("  +----------------------------------+");
         System.out.println("  | 1. Proximo Calabouco             |");
-        System.out.printf ("  | 2. Descansar (-%dXP, vida 100%%)  |%n",
-                SistemaXP.XP_PENALIDADE_DESCANSO);
+        System.out.println("  | 2. Descansar (vida 100%)         |");
         System.out.println("  | 3. Abrir Loja                    |");
         System.out.println("  | 4. Ver Inventario                |");
         System.out.printf ("  | 5. Gastar XP [%3d disp.]         |%n", sistemaXP.getXpDisponivel());
         System.out.println("  | 6. Estatisticas                  |");
-        System.out.println("  | 7. Encerrar Jogo                 |");
+        System.out.println("  | 7. Status do Personagem          |");
+        System.out.println("  | 8. Encerrar Jogo                 |");
         System.out.println("  +----------------------------------+");
         System.out.print("  Escolha: ");
 
@@ -271,12 +303,15 @@ public class Main {
                 gerenciarInventario(jogador, inventario);
                 return menuPosBoss(jogador, inventario, sistemaXP, ouro);
             case 5:
-                sistemaXP.menuGastoXP(jogador, scanner); // RF07
+                sistemaXP.menuGastoXP(jogador, scanner);
                 return menuPosBoss(jogador, inventario, sistemaXP, ouro);
             case 6:
                 exibirEstatisticas(jogador, sistemaXP);
                 return menuPosBoss(jogador, inventario, sistemaXP, ouro);
-            case 7: return false;
+            case 7:
+                exibirStatusPersonagem(jogador);
+                return menuPosBoss(jogador, inventario, sistemaXP, ouro);
+            case 8: return false;
             default:
                 System.out.println("  X Opcao invalida.");
                 return true;
@@ -292,6 +327,29 @@ public class Main {
         } catch (NumberFormatException e) {
             System.out.println("  X Numero invalido.");
         }
+    }
+
+    /** Tela de status detalhado de todos os atributos do personagem. */
+    private static void exibirStatusPersonagem(PersonagemBase jogador) {
+        System.out.println("\n  +====================================+");
+        System.out.println("  |       STATUS DO PERSONAGEM         |");
+        System.out.println("  +====================================+");
+        System.out.printf ("  | Nome       : %-21s|%n", jogador.getNome());
+        System.out.printf ("  | Nivel      : %-21d|%n", jogador.getNivel());
+        System.out.printf ("  | Classe     : %-21s|%n", jogador.getClasse().getNome());
+        System.out.println("  +------------------------------------+");
+        System.out.printf ("  | Vida Atual : %-21d|%n", jogador.getVida());
+        System.out.printf ("  | Vida Max   : %-21d|%n", jogador.getVidaMaxima());
+        System.out.printf ("  | Energia    : %d/%-18d|%n", jogador.getEnergia(), jogador.getEnergiaMaxima());
+        System.out.println("  +------------------------------------+");
+        System.out.printf ("  | Ataque     : %-21d|%n", jogador.getAtaque());
+        System.out.printf ("  | Defesa     : %-21d|%n", jogador.getDefesa());
+        System.out.printf ("  | Agilidade  : %-20d%%|%n", jogador.getChanceEsquiva());
+        System.out.printf ("  | Critico    : %-20d%%|%n", jogador.getChanceCritico());
+        System.out.println("  +------------------------------------+");
+        System.out.printf ("  | Ouro       : %-20dG|%n", jogador.getOuro());
+        System.out.printf ("  | Status     : %-21s|%n", jogador.getStatus().getNome());
+        System.out.println("  +====================================+");
     }
 
     private static void exibirEstatisticas(PersonagemBase jogador, SistemaXP sistemaXP) {

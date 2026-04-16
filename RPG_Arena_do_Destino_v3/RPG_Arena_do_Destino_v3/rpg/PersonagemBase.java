@@ -164,16 +164,23 @@ public abstract class PersonagemBase {
 
     public String barraVida() {
         int b = 20, c = (int)((double)vida / vidaMaxima * b);
-        StringBuilder sb = new StringBuilder("[");
+        StringBuilder sb = new StringBuilder("\u001B[32m["); // verde
         for (int i = 0; i < b; i++) sb.append(i < c ? "X" : ".");
-        return sb.append("] ").append(vida).append("/").append(vidaMaxima).toString();
+        return sb.append("]\u001B[0m ").append(vida).append("/").append(vidaMaxima).toString();
+    }
+
+    public String barraVidaInimigo() {
+        int b = 20, c = (int)((double)vida / vidaMaxima * b);
+        StringBuilder sb = new StringBuilder("\u001B[31m["); // vermelho
+        for (int i = 0; i < b; i++) sb.append(i < c ? "X" : ".");
+        return sb.append("]\u001B[0m ").append(vida).append("/").append(vidaMaxima).toString();
     }
 
     public String barraEnergia() {
         int b = 10, c = (int)((double)energia / energiaMaxima * b);
-        StringBuilder sb = new StringBuilder("[");
+        StringBuilder sb = new StringBuilder("\u001B[34m["); // azul
         for (int i = 0; i < b; i++) sb.append(i < c ? "#" : ".");
-        return sb.append("] ").append(energia).append("/").append(energiaMaxima).toString();
+        return sb.append("]\u001B[0m ").append(energia).append("/").append(energiaMaxima).toString();
     }
 
     // Getters
@@ -221,4 +228,12 @@ public abstract class PersonagemBase {
         energia = Math.min(energia + ganho, energiaMaxima);
         System.out.printf("  [UP] Energia Max: +%d → %d%n", ganho, energiaMaxima);
     }
+
+    public void melhorarAgilidadeComXP(int ganho) {
+        int novaEsquiva = Math.min(90, chanceEsquiva + ganho);
+        setChanceEsquiva(novaEsquiva);
+        System.out.printf("  [UP] Agilidade (Esquiva): +%d%% → %d%%%n", ganho, chanceEsquiva);
+    }
+
+    public void setChanceEsquiva(int v) { chanceEsquiva = Math.max(0, Math.min(90, v)); }
 }

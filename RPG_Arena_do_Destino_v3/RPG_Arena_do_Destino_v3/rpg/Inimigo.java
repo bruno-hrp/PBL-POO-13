@@ -82,7 +82,7 @@ public class Inimigo extends PersonagemBase implements HabilidadeEspecial, Recup
     }
 
     private static Inimigo criarDeTemplate(String[] t, int nivelJogador, boolean boss) {
-        double escala = 1.0 + (nivelJogador - 1) * 0.25;
+        double escala = 1.0 + (nivelJogador - 1) * 0.05;
         int vida   = (int)(Integer.parseInt(t[1]) * escala);
         int ataque = (int)(Integer.parseInt(t[2]) * escala);
         int defesa = (int)(Integer.parseInt(t[3]) * escala);
